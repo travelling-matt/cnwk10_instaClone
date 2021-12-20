@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { PostCreator } from "./components/postCreator";
 
@@ -14,32 +14,42 @@ const App = () => {
     setList([...list, post]); //use spread operator to update list array with submitted post
   };
 
-  const handler = async () => {
+  const picAPI = async () => {
     try {
-      const response = await fetch("https://picsum.photos/400");
-      console.log("http response", response);
-      // if (response.status !== 200) {
-      //   throw new Error("oops http error");
-      // }
-      const data = await response.json();
-      console.log("API info all", data);
-      console.log("API info array 0", data[0]);
-      setPics(data);
+      const response = await fetch("https://picsum.photos/v2/list?page=2&limit=6");
+      console.log(response);
+      if (response.status !== 200) {
+        throw new Error("oops http error");
+      }
+      const picData = await response.json([]);
+      console.log("API info all", picData);
+      //console.log("API info array 0", picData[0]);
+      setPics(picData);
+      console.log(pics);
+      return(picData);
     } catch (error) {
         console.log(error);
     }
   };
 
+  useEffect(() => {
+    picAPI()
+  }, []);
+  
   return (
     <div className="App">
-      <h1>{user ? `Welcome ${user}` : "Please sign in"}</h1>
+      <div className="NavTop">
+        Instagram
+      </div>
+      {/* <h1>{user ? `Welcome ${user}` : "Please sign in"}</h1>
       <input onChange={(e) => setUser(e.target.value)} />
       <PostCreator setPost={setPost} submitHandler={submitHandler} />
       {list.map((item, index) => {
         return <p key={index}>{item}</p>;
-      })}
+      })} */}
       {pics.map((item, index) => {
-        return <img key={index}>{item}</img>;
+        return <img key={index} src={item.url} alt={item.author}/>;
+        // console.log(`${item.url[0]}`);
       })}
     </div>
   );
